@@ -29,7 +29,7 @@ public class SecurityConfig {
                     .addFilterBefore(corsFilter(), CorsFilter.class)
                     .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                     .authorizeRequests()
-                    .antMatchers("/auth/signin").permitAll()
+                    .antMatchers("/auth/*").permitAll()
                     .anyRequest().authenticated()
                     .and()
                     .build();

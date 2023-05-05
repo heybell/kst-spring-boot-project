@@ -24,4 +24,11 @@ public class UserService {
 
         return new JwtUserInfoDTO(user.getSeq(), user.getName(), user.getRole().getSeq());
     }
+
+    public boolean existsUser(String email, String name) {
+        User user = userRepository.findByEmailAndNameIsNotNullOrNameAndEmailIsNotNull(email, name);
+
+        if (user == null) return false;
+        else return true;
+    }
 }

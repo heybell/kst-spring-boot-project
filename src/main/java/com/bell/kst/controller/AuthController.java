@@ -35,27 +35,45 @@ public class AuthController {
 
     @PostMapping(value = "signin")
     public ResponseEntity<?> signin(HttpServletResponse response, @RequestBody UserDTO param) {
-        try {
-            String email = param.getEmail();
-            String password = param.getPassword();
+        String email = param.getEmail();
+        String password = param.getPassword();
 
-            JwtUserInfoDTO user = userService.fetchUserInfo(email, password);
-            if (user == null)
-                return ResponseEntity.ok(new StatusCodeDTO(StatusCode.SIGNIN_FAIL.getCode(), StatusCode.SIGNIN_FAIL.getMessage()));
+        Integer[] str = new Integer[3];
+        for (int i = 0; i < 4; i++) str[i] = i;
 
-            String token = jwtTokenProvider.generateToken(email, user);
-            response.setHeader("Authorization", "Bearer " + token);
-            
-            List<AuthDTO> auth = authService.fetchAuthInfo(user.getRole());
+        JwtUserInfoDTO user = userService.fetchUserInfo(email, password);
+        if (user == null)
+            return ResponseEntity.ok(new StatusCodeDTO(StatusCode.ACCEPTED.getCode(), StatusCode.ACCEPTED.getMessage()));
 
-            Map<String, Object> responseMap = new HashMap<>();
-            responseMap.put("user", user);
-            responseMap.put("auth", auth);
-            responseMap.put("status", new StatusCodeDTO(StatusCode.SIGNIN_SUCCESS.getCode(), StatusCode.SIGNIN_SUCCESS.getMessage()));
+        String token = jwtTokenProvider.generateToken(email, user);
+        response.setHeader("Authorization", "Bearer " + token);
 
-            return ResponseEntity.ok(responseMap);
-        } catch (Exception e) {
-            throw new RuntimeException("An exception occurred while processing the signin endpoint.", e);
-        }
+        List<AuthDTO> auth = authService.fetchAuthInfo(user.getRole());
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("user", user);
+        responseMap.put("auth", auth);
+        responseMap.put("status", new StatusCodeDTO(StatusCode.SUCCESS.getCode(), StatusCode.SUCCESS.getMessage()));
+
+        return ResponseEntity.ok(responseMap);
+    }
+
+    @PostMapping(value = "signup")
+    public ResponseEntity<?> signup(@RequestBody UserDTO param) {
+        return ResponseEntity.ok("test");
+    }
+
+    @PostMapping(value = "check")
+    public ResponseEntity<?> check(@RequestBody UserDTO param) {
+        String email = param.getEmail();
+        String name = param.getName();
+
+        boolean user = userService.existsUser(email, name);
+
+        if (user)
+            return ResponseEntity.ok(new StatusCodeDTO(StatusCode.ACCEPTED.getCode(), StatusCode.ACCEPTED.getMessage()));
+        else
+            return ResponseEntity.ok(new StatusCodeDTO(StatusCode.SUCCESS.getCode(), StatusCode.SUCCESS.getMessage()));
+
     }
 }
